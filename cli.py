@@ -105,9 +105,8 @@ def rodar():
     while player.rodando:
         entrada = input("mediaq> ").lower()
         entrada = entrada.split()
-
         # para lidar com comandos compostos como "library list" ou "playlist add"
-        if len(entrada) == 2:
+        if len(entrada) == 2 and entrada[0] != "enqueue":
             entrada[0] = f"{entrada[0]} {entrada[1]}"
             entrada.pop()
         # para lidar com comandos compostos com argumentos, como "library load arquivo.json" ou "playlist add 3"
@@ -115,7 +114,7 @@ def rodar():
             entrada[0] = f"{entrada[0]} {entrada[1]}"
             entrada[1] = f"{' '.join(entrada[2:])}"
             del entrada[2:]
-
+        
         aux = None
         for comando in player.comandos:
             if entrada[0] == comando["comando"]:

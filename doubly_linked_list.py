@@ -96,14 +96,16 @@ class DoublyLinkedList():
     def move_next(self):
         if self._cursor is not None and self._cursor.next != self._trailer:
             self._cursor = self._cursor.next
+            return True
         else:
-            print("Não há próxima música")
+            return False
         
     def move_prev(self):
         if self._cursor is not None and self._cursor.previous != self._header:
             self._cursor = self._cursor.previous
+            return True
         else:
-            print("Não há música anterior")
+            return False
         
     def reset_cursor(self):
         self._cursor = self._header.next

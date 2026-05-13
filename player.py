@@ -1,6 +1,8 @@
+from datetime import date, datetime
 import json
 from pathlib import Path
 from doubly_linked_list import DoublyLinkedList
+from collections import deque
 
 class Player:
     def __init__(
@@ -9,11 +11,14 @@ class Player:
             comandos: list = [],
             musicas: list = [],
             playlist_obj: DoublyLinkedList | None = None,
+            filaUpNext: deque = deque(),
         ):
         self.rodando = rodando;
         self.comandos = comandos;
         self.musicas = musicas;
         self.playlist_obj = playlist_obj;
+        self.filaUpNext = filaUpNext;
+        self.historicoLista = deque(maxlen=20)
 
     def quit(self):
         self.rodando = False
@@ -97,36 +102,72 @@ class Player:
         if self.playlist_obj is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            musica = self.playlist_obj.current()
-            return print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
+            if len(self.filaUpNext) > 0:
+                musica = self.filaUpNext[0] 
+                self.historicoLista.append((musica, datetime.now()))
+                
+                print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
+                return
+            else:
+                musica = self.playlist_obj.current() 
+                self.historicoLista.append((musica, datetime.now()))
+                
+                return print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
 
 
     def proximo(self):
         if self.playlist_obj is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            self.playlist_obj.move_next()
-            return self.tocar()
+            if len(self.filaUpNext) > 0:
+                self.filaUpNext.popleft()
+                self.tocar()
+            else:
+                if self.playlist_obj.move_next():
+                    self.tocar()
+                else:
+                    print("Fim da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.")
 
 
     def anterior(self):
         if self.playlist_obj is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            self.playlist_obj.move_prev()
-            return self.tocar()
+            if self.playlist_obj.move_prev():
+                self.tocar()
+            else:
+                print("Início da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.")
 
 
-    def enfileirar(self):
-        return 
+    def enfileirar(self, musica_id : str):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        else:
+            id = int(musica_id)
+            aux = None
+            for musica in self.musicas:
+                if musica["id"] == id:
+                    aux = musica
+                    break
+
+            if aux is None:
+                print(f"Música com id {id} não encontrada na biblioteca.")
+            else:
+                self.filaUpNext.append(aux)
 
 
     def mostrarFila(self):
-        return 
+        for musica in self.filaUpNext:
+            print(f"{musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d})")
 
 
     def historico(self):
-        return 
+        print("-----------------------------------------")
+        # interar ao contrário para mostrar a música mais recente primeiro
+        for i in range(len(self.historicoLista)-1, -1, -1):
+            musica, timestamp = self.historicoLista[i]
+            print(f"{musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d}) - Tocada em {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+        print("-----------------------------------------")
 
 
     def smartShuffle(self):
