@@ -1,0 +1,172 @@
+import json
+from pathlib import Path
+from doubly_linked_list import DoublyLinkedList
+
+class Player:
+    def __init__(
+            self, 
+            rodando : bool = True,
+            comandos: list = [],
+            musicas: list = [],
+            playlist_obj: DoublyLinkedList | None = None,
+        ):
+        self.rodando = rodando;
+        self.comandos = comandos;
+        self.musicas = musicas;
+        self.playlist_obj = playlist_obj;
+
+    def quit(self):
+        self.rodando = False
+
+
+    def bibliotecaCarregar(self, arquivo : str):
+        if Path(arquivo).exists():
+            print("-----------------------------------------")
+            with open(arquivo, "r", encoding="utf-8") as f:
+                self.musicas = json.load(f)
+            print(f"Bibioteca carregada: {len(self.musicas)} faixas")
+            print("-----------------------------------------")
+        else:
+            print("Arquivo não encontrado.")
+
+
+    def bibliotecaListar(self, ordenacao : str | None = None):
+        if ordenacao: ordenacao = ordenacao.split()[1]
+        if not ordenacao: ordenacao = "id"
+
+        if ordenacao not in ["rating", "title", "artist", "id"]:
+            return print("Ordenação inválida. Use '--by rating', '--by title' ou '--by artist'.")
+        
+
+        if ordenacao == "rating":
+            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["avaliacao"])
+        elif ordenacao == "title":
+            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["titulo"])
+        elif ordenacao == "artist":
+            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["artista"])
+        else:
+            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["id"])
+
+        print("-----------------------------------------")
+        for musica in musicas_ordenadas:
+            # :02d adiciona um zero na esquerda se precisar
+            print(f"{musica["titulo"]} — {musica["artista"]} ({musica["duracao"] // 60}:{musica["duracao"] % 60:02d})")
+        print("-----------------------------------------")
+
+
+    def playlistNovo(self,nomePlaylist : str):
+        playlist = DoublyLinkedList()
+        self.playlist = nomePlaylist
+        self.playlist_obj = playlist
+        print(f'Playlist "{nomePlaylist}" criada.')
+
+
+    def playlistAdicionar(self, musica_id : str):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        
+        id = int(musica_id)
+        aux = None
+        for musica in self.musicas:
+            if musica["id"] == id:
+                aux = musica
+                break
+        
+        if aux is None:
+            print(f"Música com id {id} não encontrada na biblioteca.")
+        else:
+            self.playlist_obj.add(aux)
+
+
+    def playlistRemover(self, pos : str):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+
+        self.playlist_obj.remove_at(int(pos) - 1)
+
+
+    def playlistMostrar(self):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        print("-----------------------------------------")
+        print(self.playlist_obj)
+        print("-----------------------------------------")
+
+
+    def tocar(self):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        else:
+            musica = self.playlist_obj.current()
+            return print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
+
+
+    def proximo(self):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        else:
+            self.playlist_obj.move_next()
+            return self.tocar()
+
+
+    def anterior(self):
+        if self.playlist_obj is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        else:
+            self.playlist_obj.move_prev()
+            return self.tocar()
+
+
+    def enfileirar(self):
+        return 
+
+
+    def mostrarFila(self):
+        return 
+
+
+    def historico(self):
+        return 
+
+
+    def smartShuffle(self):
+        return 
+
+
+    def salvar(self):
+        return
+
+
+    def carregar(self):
+        return
+    
+    def registrarComandos(self):
+        self.comandos = [
+            {'comando': 'library list', 'opcao': '[--by rating|title|artist]', 'funcao': self.bibliotecaListar},
+            {'comando': 'library load', 'opcao': '<arquivo>', 'funcao': self.bibliotecaCarregar},
+            {'comando': 'playlist new', 'opcao': '<nome>', 'funcao': self.playlistNovo},
+            {'comando': 'playlist add', 'opcao': 'track_id', 'funcao': self.playlistAdicionar},
+            {'comando': 'playlist remove', 'opcao': 'pos', 'funcao': self.playlistRemover},
+            {'comando': 'playlist show', 'opcao': None, 'funcao': self.playlistMostrar},
+            {'comando': 'play', 'opcao': None, 'funcao': self.tocar},
+            {'comando': 'next', 'opcao': None, 'funcao': self.proximo},
+            {'comando': 'prev', 'opcao': None, 'funcao': self.anterior},
+            {'comando': 'enqueue', 'opcao': '<track_id>', 'funcao': self.enfileirar},
+            {'comando': 'queue show', 'opcao': None, 'funcao': self.mostrarFila},
+            {'comando': 'history', 'opcao': None, 'funcao': self.historico},
+            {'comando': 'smart-shuffle', 'opcao': '<n>', 'funcao': self.smartShuffle},
+            {'comando': 'save', 'opcao': '<arquivo>', 'funcao': self.salvar},
+            {'comando': 'load', 'opcao': '<arquivo>', 'funcao': self.carregar},
+            {'comando': 'help', 'opcao': None, 'funcao': self.ajuda},
+            {'comando': 'quit', 'opcao': None, 'funcao': self.quit},
+        ]
+
+
+    def ajuda(self):
+        print("-----------------------------------------")
+        for comando in self.comandos:
+            if comando['opcao']:
+                print(f"{comando['comando']} {comando['opcao']}")
+            else:
+                print(comando['comando'])
+        print("-----------------------------------------")
