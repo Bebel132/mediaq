@@ -102,17 +102,10 @@ class Player:
         if self.playlist_obj is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            if len(self.filaUpNext) > 0:
-                musica = self.filaUpNext[0] 
-                self.historicoLista.append((musica, datetime.now()))
-                
-                print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
-                return
-            else:
-                musica = self.playlist_obj.current() 
-                self.historicoLista.append((musica, datetime.now()))
-                
-                return print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
+            musica = self.playlist_obj.current() 
+            self.historicoLista.append((musica, datetime.now()))
+            
+            return print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
 
 
     def proximo(self):
@@ -120,8 +113,9 @@ class Player:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
             if len(self.filaUpNext) > 0:
-                self.filaUpNext.popleft()
-                self.tocar()
+                musica = self.filaUpNext.popleft()
+                self.historicoLista.append((musica, datetime.now()))
+                print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
             else:
                 if self.playlist_obj.move_next():
                     self.tocar()

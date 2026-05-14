@@ -7,7 +7,8 @@ class DoublyLinkedList():
 
         def __str__(self):
             if self._track is not None:
-                return str(self._track) + ' '
+                musica = self._track
+                return f"{musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d})\n"
             else:
                 return '|'
 
@@ -120,6 +121,9 @@ class DoublyLinkedList():
         result = ''
         current = self._header.next
         while current != self._trailer:
-            result += str(current)
+            if current == self._cursor:
+                result += '> ' + str(current)
+            else:
+                result += str(current)
             current = current.next
         return result
