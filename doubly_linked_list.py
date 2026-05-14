@@ -119,11 +119,13 @@ class DoublyLinkedList():
     
     def __str__(self):
         result = ''
+        count = 1
         current = self._header.next
         while current != self._trailer:
             if current == self._cursor:
-                result += '> ' + str(current)
+                result += f'> {count}. ' + str(current)
             else:
-                result += str(current)
+                result += f'  {count}. ' + str(current)
             current = current.next
+            count += 1
         return result

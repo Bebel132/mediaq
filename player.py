@@ -28,11 +28,9 @@ class Player:
 
     def bibliotecaCarregar(self, arquivo : str):
         if Path(arquivo).exists():
-            print("-----------------------------------------")
             with open(arquivo, "r", encoding="utf-8") as f:
                 self.musicas = json.load(f)
             print(f"Bibioteca carregada: {len(self.musicas)} faixas")
-            print("-----------------------------------------")
         else:
             print("Arquivo não encontrado.")
 
@@ -54,11 +52,9 @@ class Player:
         else:
             musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["id"])
 
-        print("-----------------------------------------")
         for musica in musicas_ordenadas:
             # :02d adiciona um zero na esquerda se precisar
             print(f"{musica["titulo"]} — {musica["artista"]} ({musica["duracao"] // 60}:{musica["duracao"] % 60:02d})")
-        print("-----------------------------------------")
 
 
     def playlistNovo(self,nomePlaylist : str):
@@ -95,9 +91,7 @@ class Player:
     def playlistMostrar(self):
         if self.playlist_obj is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
-        print("-----------------------------------------")
         print(self.playlist_obj)
-        print("-----------------------------------------")
 
 
     def tocar(self):
@@ -158,12 +152,10 @@ class Player:
 
 
     def historico(self):
-        print("-----------------------------------------")
         # interar ao contrário para mostrar a música mais recente primeiro
         for i in range(len(self.historicoLista)-1, -1, -1):
             musica, timestamp = self.historicoLista[i]
-            print(f"{musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d}) - Tocada em {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
-        print("-----------------------------------------")
+            print(f"{len(self.historicoLista) - i}. {musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d}) - Tocada em [{timestamp.strftime('%H:%M:%S')}]")
 
 
     def smartShuffle(self, n : str):
@@ -187,7 +179,7 @@ class Player:
                 if posicao_no_historico != 0:
                     penalidade = 5 - posicao_no_historico
 
-                chave = -(musica['avaliacao'] * 10) + 5 - penalidade
+                chave = -(musica['avaliacao'] * 10) + penalidade
                 lista.put((chave, musica))
             
             self.playlistNovo("Smart Shuffle")
@@ -198,7 +190,7 @@ class Player:
             self.playlistMostrar()
         else:
             for musica in musicas:
-                chave = ((-musica['avaliacao'] * 10), random.random())
+                chave = (-(musica['avaliacao'] * 10), random.random())
                 lista.put((chave, musica))
             
             self.playlistNovo("Smart Shuffle")
@@ -207,7 +199,6 @@ class Player:
                 self.playlistAdicionar(musica["id"])
             
             self.playlistMostrar()
-
 
 
     def salvar(self):
@@ -240,10 +231,8 @@ class Player:
 
 
     def ajuda(self):
-        print("-----------------------------------------")
         for comando in self.comandos:
             if comando['opcao']:
                 print(f"{comando['comando']} {comando['opcao']}")
             else:
                 print(comando['comando'])
-        print("-----------------------------------------")
