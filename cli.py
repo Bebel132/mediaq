@@ -106,7 +106,7 @@ def rodar():
         entrada = input("mediaq> ").lower()
         entrada = entrada.split()
         # para lidar com comandos compostos como "library list" ou "playlist add"
-        if len(entrada) == 2 and entrada[0] != "enqueue": # excessão pro unico comando simples que tem um argumento
+        if len(entrada) == 2 and entrada[0] not in ["enqueue", "smart-shuffle", "save", "load"]: # excessão pro unico comando simples que tem um argumento
             entrada[0] = f"{entrada[0]} {entrada[1]}"
             entrada.pop()
         # para lidar com comandos compostos com argumentos, como "library load arquivo.json" ou "playlist add 3"

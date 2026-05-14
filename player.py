@@ -1,8 +1,10 @@
 from datetime import date, datetime
 import json
 from pathlib import Path
+import random
 from doubly_linked_list import DoublyLinkedList
 from collections import deque
+from queue import PriorityQueue
 
 class Player:
     def __init__(
@@ -164,8 +166,48 @@ class Player:
         print("-----------------------------------------")
 
 
-    def smartShuffle(self):
-        return 
+    def smartShuffle(self, n : str):
+        musicas = self.musicas[:int(n)]
+        lista = PriorityQueue()
+        
+        if len(self.historicoLista) != 0:
+            historico = [item[0] for item in list(self.historicoLista)[-5:]]
+            
+            for musica in musicas:
+                posicao_no_historico = 0
+
+                for i in range(len(historico)-1, -1, -1):
+                    if musica.get("id") == historico[i].get("id"):
+                        musica.get("id")
+                        historico[i].get("id")
+                        posicao_no_historico = len(historico) - i
+                        break
+
+                penalidade = 0
+                if posicao_no_historico != 0:
+                    penalidade = 5 - posicao_no_historico
+
+                chave = -(musica['avaliacao'] * 10) + 5 - penalidade
+                lista.put((chave, musica))
+            
+            self.playlistNovo("Smart Shuffle")
+            while not lista.empty():
+                chave, musica = lista.get()
+                self.playlistAdicionar(musica["id"])
+            
+            self.playlistMostrar()
+        else:
+            for musica in musicas:
+                chave = ((-musica['avaliacao'] * 10), random.random())
+                lista.put((chave, musica))
+            
+            self.playlistNovo("Smart Shuffle")
+            while not lista.empty():
+                chave, musica = lista.get()
+                self.playlistAdicionar(musica["id"])
+            
+            self.playlistMostrar()
+
 
 
     def salvar(self):
