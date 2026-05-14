@@ -13,35 +13,35 @@ O foco do projeto está no uso adequado de quatro estruturas lineares distintas,
 
 ## Exemplo de sessão
 ```bash
-    mediaq> library load library_exemplo.json 
-    Bibioteca carregada: 12 faixas
-    mediaq> playlist new minha
-    Playlist "minha" criada.
-    mediaq> playlist add 3
-    mediaq> playlist add 7
-    mediaq> playlist add 1
-    mediaq> playlist show
-    > 1. Azul — Zimbra (3:18)
-    2. Talvez Eu Esteja — Selvagens a Procura de Lei (3:27)
-    3. Verao — Zimbra (3:51)
+mediaq> library load library_exemplo.json 
+Bibioteca carregada: 12 faixas
+mediaq> playlist new minha
+Playlist "minha" criada.
+mediaq> playlist add 3
+mediaq> playlist add 7
+mediaq> playlist add 1
+mediaq> playlist show
+> 1. Azul — Zimbra (3:18)
+2. Talvez Eu Esteja — Selvagens a Procura de Lei (3:27)
+3. Verao — Zimbra (3:51)
 
-    mediaq> play     
-    >>> Tocando: "Azul" — Zimbra (3:18)
-    mediaq> enqueue 5
-    mediaq> next
-    >>> Tocando: "Destruicao" — Selvagens a Procura de Lei (3:30)
-    mediaq> next
-    >>> Tocando: "Talvez Eu Esteja" — Selvagens a Procura de Lei (3:27)
-    mediaq> next
-    >>> Tocando: "Verao" — Zimbra (3:51)
-    mediaq> next
-    Fim da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.
-    mediaq> history
-    1. Verao — Zimbra (3:51) - Tocada em [12:03:39]
-    2. Talvez Eu Esteja — Selvagens a Procura de Lei (3:27) - Tocada em [12:03:33]
-    3. Destruicao — Selvagens a Procura de Lei (3:30) - Tocada em [12:03:30]
-    4. Azul — Zimbra (3:18) - Tocada em [12:03:24]
-    mediaq> quit 
+mediaq> play     
+>>> Tocando: "Azul" — Zimbra (3:18)
+mediaq> enqueue 5
+mediaq> next
+>>> Tocando: "Destruicao" — Selvagens a Procura de Lei (3:30)
+mediaq> next
+>>> Tocando: "Talvez Eu Esteja" — Selvagens a Procura de Lei (3:27)
+mediaq> next
+>>> Tocando: "Verao" — Zimbra (3:51)
+mediaq> next
+Fim da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.
+mediaq> history
+1. Verao — Zimbra (3:51) - Tocada em [12:03:39]
+2. Talvez Eu Esteja — Selvagens a Procura de Lei (3:27) - Tocada em [12:03:33]
+3. Destruicao — Selvagens a Procura de Lei (3:30) - Tocada em [12:03:30]
+4. Azul — Zimbra (3:18) - Tocada em [12:03:24]
+mediaq> quit 
 ```
 
 ## Fórmula para o smart-shuffle
@@ -59,7 +59,7 @@ chave = -(avaliacao * 10) + penalidade
 # chave é o valor de prioridade da música para a nova playlist
 ```
 
-Depois disso, é guardado em uma tupla a chave e a música em uma PriorityQueue(), criado uma nova playlist e a lista será percorrida para adicionar as músicas ordenadas por prioridade na playlist
+Depois disso, é guardado em uma *tupla* a **chave** e a **música** em uma *PriorityQueue()*, é criado uma nova playlist e a lista será percorrida para adicionar as músicas ordenadas por prioridade na playlist
 
 **Mas**, existe a possibilidade de não ter músicas no histórico, nesse caso, o calculo para obter a prioridade é a combinação da avaliação com um número aleatório
 
