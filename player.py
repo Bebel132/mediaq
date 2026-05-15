@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 import json
 from pathlib import Path
 import random
@@ -201,11 +201,99 @@ class Player:
             self.playlistMostrar()
 
 
-    def salvar(self):
+    def salvar(self, arquivo):
+        if not arquivo:
+            print("Arquivo não informado.")
+            return
+
+        playlist_ids = []
+        cursor_index = None
+        if self.playlist_obj is not None:
+            playlist_ids = []
+            for musica in self.playlist_obj:
+                if musica is not None:
+                    playlist_ids.append(musica.get("id"))
+            cursor_track = self.playlist_obj.current()
+            if cursor_track is not None:
+                try:
+                    cursor_index = playlist_ids.index(cursor_track.get("id"))
+                except ValueError:
+                    cursor_index = None
+
+        fila_ids = [musica.get("id") for musica in self.filaUpNext if musica is not None]
+        historico = []
+        for musica, timestamp in self.historicoLista:
+            if musica is None:
+                continue
+            historico.append(
+                {
+                    "id": musica.get("id"),
+                    "timestamp": timestamp.isoformat(),
+                }
+            )
+
+        estado = {
+            "musicas": self.musicas,
+            "playlist": {
+                "nome": getattr(self, "playlist", None),
+                "tracks": playlist_ids,
+                "cursor_index": cursor_index,
+            },
+            "fila_up_next": fila_ids,
+            "historico": historico,
+        }
+
+        with open(arquivo, "w", encoding="utf-8") as f:
+            json.dump(estado, f, indent=2)
+        print(f"Estado salvo em {arquivo}.")
         return
 
 
-    def carregar(self):
+    def carregar(self, arquivo):
+        if not arquivo or not Path(arquivo).exists():
+            print("Arquivo não encontrado.")
+            return
+
+        with open(arquivo, "r", encoding="utf-8") as f:
+            estado = json.load(f)
+
+        self.musicas = estado.get("musicas", [])
+        musicas_por_id = {musica.get("id"): musica for musica in self.musicas}
+
+        playlist_info = estado.get("playlist", {})
+        self.playlist = playlist_info.get("nome")
+        self.playlist_obj = DoublyLinkedList()
+        for track_id in playlist_info.get("tracks", []):
+            musica = musicas_por_id.get(track_id)
+            if musica is not None:
+                self.playlist_obj.add(musica)
+
+        cursor_index = playlist_info.get("cursor_index")
+        if cursor_index is not None and self.playlist_obj is not None:
+            self.playlist_obj.reset_cursor()
+            for _ in range(cursor_index):
+                if not self.playlist_obj.move_next():
+                    break
+
+        self.filaUpNext = deque()
+        for track_id in estado.get("fila_up_next", []):
+            musica = musicas_por_id.get(track_id)
+            if musica is not None:
+                self.filaUpNext.append(musica)
+
+        self.historicoLista = deque(maxlen=20)
+        for item in estado.get("historico", []):
+            musica = musicas_por_id.get(item.get("id"))
+            if musica is None:
+                continue
+            timestamp_str = item.get("timestamp")
+            try:
+                timestamp = datetime.fromisoformat(timestamp_str)
+            except (TypeError, ValueError):
+                timestamp = datetime.now()
+            self.historicoLista.append((musica, timestamp))
+
+        print(f"Estado carregado de {arquivo}.")
         return
     
     def registrarComandos(self):

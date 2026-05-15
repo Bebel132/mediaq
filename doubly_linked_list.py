@@ -44,17 +44,7 @@ class DoublyLinkedList():
         self._cursor = None
         self._length = 0
 
-    # TODO: implementar os seguintes métodos:
-    # - add(track): anexa uma nova faixa ao final da playlist; ✅
-    # - remove_at(pos): remove a track que se encontra na posição pos da lista; ✅
-    # - current(): retorna a faixa da playlist que se encontra em execução; ✅
-    # - move_next(): começa a executar a próxima música da lista; ✅
-    # - move_prev(): começa a executar a música anterior da lista; ✅
-    # - reset_cursor(): reinicializa o cursor da playlist (o cursor representa a música que está em
-    # execução no momento); ✅
-    # - __len__: método especial que retorna o tamanho da playlist; ✅
-    # - __iter__: método especial que implementa um iterador para a playlist.
-
+        
     def add(self, track):
         if self.empty():
             new_track = self._DoublyNode(track, self._header, self._trailer)
@@ -113,6 +103,14 @@ class DoublyLinkedList():
 
     def empty(self):
         return self._length == 0
+    
+    def __iter__(self):
+        itens = []
+        current = self._header.next
+        while current != self._trailer:
+            itens.append(current.track)
+            current = current.next
+        return iter(itens)
 
     def __len__(self):
         return self._length
