@@ -7,8 +7,8 @@ class DoublyLinkedList():
 
         def __str__(self):
             if self._track is not None:
-                musica = self._track
-                return f"{musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d})\n"
+                track = self._track
+                return f"{track.title} — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})\n"
             else:
                 return '|'
 
@@ -59,8 +59,7 @@ class DoublyLinkedList():
 
     def remove_at(self, pos):
         if pos >= self._length or pos < 0:
-            print("Posição inválida")
-            return
+            raise IndexError("Posição inválida")
 
         atual = self._header.next
         for _ in range(pos):

@@ -1,13 +1,10 @@
-import datetime
-
-
 class Track:
-    def __init__(self, id: int, titulo: str, artista: str, duracao: int, avaliacao: int, data_adicao: str):
+    def __init__(self, id: int, title: str, artist: str, duration: int, rating: int, data_adicao: str):
         self.__id = id
-        self.__titulo = titulo
-        self.__artista = artista
-        self.__duracao = duracao
-        self.__avaliacao = avaliacao
+        self.__title = title
+        self.__artist = artist
+        self.__duration = duration
+        self.__rating = rating
         self.__data_adicao = data_adicao
 
     @property
@@ -15,36 +12,36 @@ class Track:
         return self.__id
 
     @property
-    def titulo(self):
-        return self.__titulo
+    def title(self):
+        return self.__title
     
-    @titulo.setter
-    def titulo(self, titulo):
-        self.__titulo = titulo
+    @title.setter
+    def title(self, title):
+        self.__title = title
     
     @property
-    def artista(self):
-        return self.__artista
+    def artist(self):
+        return self.__artist
     
-    @artista.setter
-    def artista(self, artista):
-        self.__artista = artista
+    @artist.setter
+    def artist(self, artist):
+        self.__artist = artist
 
     @property
-    def duracao(self):
-        return self.__duracao
+    def duration(self):
+        return self.__duration
     
-    @duracao.setter
-    def duracao(self, duracao):
-        self.__duracao = duracao
+    @duration.setter
+    def duration(self, duration):
+        self.__duration = duration
 
     @property
-    def avaliacao(self):
-        return self.__avaliacao
+    def rating(self):
+        return self.__rating
     
-    @avaliacao.setter
-    def avaliacao(self, avaliacao):
-        self.__avaliacao = avaliacao
+    @rating.setter
+    def rating(self, rating):
+        self.__rating = rating
 
     @property
     def data_adicao(self):
@@ -55,4 +52,4 @@ class Track:
         self.__data_adicao = data_adicao
 
     def __str__(self):
-        return f'{self.__id} - {self.__titulo} - {self.__artista} - {self.__duracao} - {self.__avaliacao} - {self.__data_adicao}'
+        return f'{self.__id} - {self.__title} - {self.__artist} - {self.__duration} - {self.__rating} - {self.__data_adicao}'

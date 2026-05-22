@@ -1,98 +1,82 @@
 [
-	{
-		"id": 1,
-		"titulo": "Verao",
-		"artista": "Zimbra",
-		"duracao": 231,
-		"avaliacao": 5,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 2,
-		"titulo": "O Que Era Certo",
-		"artista": "Zimbra",
-		"duracao": 214,
-		"avaliacao": 4,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 3,
-		"titulo": "Azul",
-		"artista": "Zimbra",
-		"duracao": 198,
-		"avaliacao": 4,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 4,
-		"titulo": "A Vida Passa",
-		"artista": "Zimbra",
-		"duracao": 245,
-		"avaliacao": 5,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 5,
-		"titulo": "Destruicao",
-		"artista": "Selvagens a Procura de Lei",
-		"duracao": 210,
-		"avaliacao": 4,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 6,
-		"titulo": "Mar Fechado",
-		"artista": "Selvagens a Procura de Lei",
-		"duracao": 223,
-		"avaliacao": 5,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 7,
-		"titulo": "Talvez Eu Esteja",
-		"artista": "Selvagens a Procura de Lei",
-		"duracao": 207,
-		"avaliacao": 3,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 8,
-		"titulo": "Sem Voce",
-		"artista": "Selvagens a Procura de Lei",
-		"duracao": 233,
-		"avaliacao": 4,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 9,
-		"titulo": "Foco",
-		"artista": "Menores Atos",
-		"duracao": 201,
-		"avaliacao": 4,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 10,
-		"titulo": "Luzes",
-		"artista": "Menores Atos",
-		"duracao": 219,
-		"avaliacao": 5,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 11,
-		"titulo": "Vertigem",
-		"artista": "Menores Atos",
-		"duracao": 226,
-		"avaliacao": 3,
-		"data_adicao": "2026-05-11"
-	},
-	{
-		"id": 12,
-		"titulo": "Cores",
-		"artista": "Menores Atos",
-		"duracao": 212,
-		"avaliacao": 4,
-		"data_adicao": "2026-05-11"
-	}
+  {
+    "id": 1,
+    "title": "Águas de Março",
+    "artist": "Elis Regina",
+    "duration": 212,
+    "rating": 5,
+    "data_adicao": "2025-02-10"
+  },
+  {
+    "id": 2,
+    "title": "Construção",
+    "artist": "Chico Buarque",
+    "duration": 381,
+    "rating": 5,
+    "data_adicao": "2025-02-12"
+  },
+  {
+    "id": 3,
+    "title": "Carinhoso",
+    "artist": "Pixinguinha",
+    "duration": 185,
+    "rating": 4,
+    "data_adicao": "2025-02-14"
+  },
+  {
+    "id": 4,
+    "title": "Garota de Ipanema",
+    "artist": "Tom Jobim",
+    "duration": 312,
+    "rating": 5,
+    "data_adicao": "2025-02-16"
+  },
+  {
+    "id": 5,
+    "title": "Asa Branca",
+    "artist": "Luiz Gonzaga",
+    "duration": 165,
+    "rating": 4,
+    "data_adicao": "2025-02-18"
+  },
+  {
+    "id": 6,
+    "title": "Oração ao Tempo",
+    "artist": "Caetano Veloso",
+    "duration": 248,
+    "rating": 4,
+    "data_adicao": "2025-02-20"
+  },
+  {
+    "id": 7,
+    "title": "O Leãozinho",
+    "artist": "Caetano Veloso",
+    "duration": 156,
+    "rating": 3,
+    "data_adicao": "2025-02-22"
+  },
+  {
+    "id": 8,
+    "title": "Pais e Filhos",
+    "artist": "Legião Urbana",
+    "duration": 350,
+    "rating": 5,
+    "data_adicao": "2025-02-24"
+  },
+  {
+    "id": 9,
+    "title": "Sampa",
+    "artist": "Caetano Veloso",
+    "duration": 245,
+    "rating": 3,
+    "data_adicao": "2025-02-26"
+  },
+  {
+    "id": 10,
+    "title": "Marvin",
+    "artist": "Titãs",
+    "duration": 273,
+    "rating": 4,
+    "data_adicao": "2025-02-28"
+  }
 ]

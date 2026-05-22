@@ -2,176 +2,192 @@ from datetime import datetime
 import json
 from pathlib import Path
 import random
-from doubly_linked_list import DoublyLinkedList
+
+from mediaq.models import Track
+from .doubly_linked_list import DoublyLinkedList
 from collections import deque
 from queue import PriorityQueue
 
-class Player:
+class MediaPlayer:
     def __init__(
             self, 
-            rodando : bool = True,
-            comandos: list = [],
-            musicas: list = [],
-            playlist_obj: DoublyLinkedList | None = None,
-            filaUpNext: deque = deque(),
+            running : bool = True,
+            commands: list = [],
+            playlist: DoublyLinkedList | None = None,
+            up_next: deque = deque(),
         ):
-        self.rodando = rodando;
-        self.comandos = comandos;
-        self.musicas = musicas;
-        self.playlist_obj = playlist_obj;
-        self.filaUpNext = filaUpNext;
-        self.historicoLista = deque(maxlen=20)
+        self.running = running;
+        self.commands = commands;
+        self.library = [];
+        self.playlist = playlist;
+        self.playlist_name = None
+        self.up_next = up_next;
+        self.history = deque(maxlen=20)
 
     def quit(self):
-        self.rodando = False
+        self.running = False
 
 
-    def bibliotecaCarregar(self, arquivo : str):
-        if Path(arquivo).exists():
-            with open(arquivo, "r", encoding="utf-8") as f:
-                self.musicas = json.load(f)
-            print(f"Bibioteca carregada: {len(self.musicas)} faixas")
+    def load_library(self, file : str):
+        if Path(file).exists():
+            with open(file, "r", encoding="utf-8") as f:
+                tracks = json.load(f)
+                for track in tracks:
+                    self.library.append(Track(
+                        id=track.get("id"),
+                        title=track.get("title"),
+                        artist=track.get("artist"),
+                        duration=track.get("duration"),
+                        rating=track.get("rating"),
+                        data_adicao=track.get("date_added"),   
+                    ))
+            print(f"Bibioteca carregada: {len(self.library)} faixas")
         else:
             print("Arquivo não encontrado.")
 
 
-    def bibliotecaListar(self, ordenacao : str | None = None):
-        if ordenacao: ordenacao = ordenacao.split()[1]
-        if not ordenacao: ordenacao = "id"
+    def list_library(self, ordering : str | None = None):
+        if ordering: ordering = ordering.split()[1]
+        if not ordering: ordering = "id"
 
-        if ordenacao not in ["rating", "title", "artist", "id"]:
+        if ordering not in ["rating", "title", "artist", "id"]:
             return print("Ordenação inválida. Use '--by rating', '--by title' ou '--by artist'.")
         
 
-        if ordenacao == "rating":
-            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["avaliacao"])
-        elif ordenacao == "title":
-            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["titulo"])
-        elif ordenacao == "artist":
-            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["artista"])
+        if ordering == "rating":
+            ordered_library = sorted(self.library, key=lambda track: track.rating)
+        elif ordering == "title":
+            ordered_library = sorted(self.library, key=lambda track: track.title)
+        elif ordering == "artist":
+            ordered_library = sorted(self.library, key=lambda track: track.artist)
         else:
-            musicas_ordenadas = sorted(self.musicas, key=lambda musica: musica["id"])
+            ordered_library = sorted(self.library, key=lambda track: track.id)
 
-        for musica in musicas_ordenadas:
+        for track in ordered_library:
             # :02d adiciona um zero na esquerda se precisar
-            print(f"{musica["titulo"]} — {musica["artista"]} ({musica["duracao"] // 60}:{musica["duracao"] % 60:02d})")
+            #print(f"{track.title} — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})")
+            print(f"{track.title} — {track.artist} {track.duration}")
 
 
-    def playlistNovo(self,nomePlaylist : str):
+    def new_playlist(self,nomePlaylist : str):
         playlist = DoublyLinkedList()
-        self.playlist = nomePlaylist
-        self.playlist_obj = playlist
+        self.playlist_name = nomePlaylist
+        self.playlist = playlist
         print(f'Playlist "{nomePlaylist}" criada.')
 
 
-    def playlistAdicionar(self, musica_id : str):
-        if self.playlist_obj is None:
+    def add_to_playlist(self, id : int):
+        if self.playlist is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         
-        id = int(musica_id)
         aux = None
-        for musica in self.musicas:
-            if musica["id"] == id:
-                aux = musica
+        for track in self.library:
+            if track.id == id:
+                aux = track
                 break
         
         if aux is None:
             print(f"Música com id {id} não encontrada na biblioteca.")
         else:
-            self.playlist_obj.add(aux)
+            self.playlist.add(aux)
 
 
-    def playlistRemover(self, pos : str):
-        if self.playlist_obj is None:
+    def remove_from_playlist(self, pos : str):
+        if self.playlist is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
 
-        self.playlist_obj.remove_at(int(pos) - 1)
+        self.playlist.remove_at(int(pos) - 1)
 
 
-    def playlistMostrar(self):
-        if self.playlist_obj is None:
+    def playlist_show(self):
+        if self.playlist is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
-        print(self.playlist_obj)
+        print(self.playlist)
 
 
-    def tocar(self):
-        if self.playlist_obj is None:
-            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
-        else:
-            musica = self.playlist_obj.current() 
-            self.historicoLista.append((musica, datetime.now()))
-            
-            return print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
-
-
-    def proximo(self):
-        if self.playlist_obj is None:
+    def play(self):
+        if self.playlist is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            if len(self.filaUpNext) > 0:
-                musica = self.filaUpNext.popleft()
-                self.historicoLista.append((musica, datetime.now()))
-                print(f'>>> Tocando: "{musica.get("titulo")}" — {musica.get("artista")} ({musica.get("duracao") // 60}:{musica.get("duracao") % 60:02d})')
+            if len(self.up_next) > 0:
+                track = self.up_next.popleft()
+                self.history.append((track, datetime.now()))
+                return track
             else:
-                if self.playlist_obj.move_next():
-                    self.tocar()
+                track = self.playlist.current() 
+                self.history.append((track, datetime.now()))
+                # print(f'>>> Tocando: "{track.get("titulo")}" — {track.get("artista")} ({track.get("duracao") // 60}:{track.get("duracao") % 60:02d})')
+                return track
+
+
+    def next(self):
+        if self.playlist is None:
+            return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
+        else:
+            if len(self.up_next) > 0:
+                track = self.up_next.popleft()
+                self.history.append((track, datetime.now()))
+                return track
+                #print(f'>>> Tocando: "{track.get("titulo")}" — {track.get("artista")} ({track.get("duracao") // 60}:{track.get("duracao") % 60:02d})')
+            else:
+                if self.playlist.move_next():
+                    return self.play()
                 else:
                     print("Fim da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.")
 
 
-    def anterior(self):
-        if self.playlist_obj is None:
+    def prev(self):
+        if self.playlist is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            if self.playlist_obj.move_prev():
-                self.tocar()
+            if self.playlist.move_prev():
+                return self.play()
             else:
                 print("Início da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.")
 
 
-    def enfileirar(self, musica_id : str):
-        if self.playlist_obj is None:
+    def enqueue(self, id : int):
+        if self.playlist is None:
             return print("Nenhuma playlist criada. Use 'playlist new <nome>' para criar uma playlist.")
         else:
-            id = int(musica_id)
             aux = None
-            for musica in self.musicas:
-                if musica["id"] == id:
-                    aux = musica
+            for track in self.library:
+                if track.id == id:
+                    aux = track
                     break
 
             if aux is None:
                 print(f"Música com id {id} não encontrada na biblioteca.")
             else:
-                self.filaUpNext.append(aux)
+                self.up_next.append(aux)
 
 
-    def mostrarFila(self):
-        for musica in self.filaUpNext:
-            print(f"{musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d})")
+    def queue_show(self):
+        for track in self.up_next:
+            print(f"{track.title} — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})")
 
 
-    def historico(self):
+    def playback_history(self):
         # interar ao contrário para mostrar a música mais recente primeiro
-        for i in range(len(self.historicoLista)-1, -1, -1):
-            musica, timestamp = self.historicoLista[i]
-            print(f"{len(self.historicoLista) - i}. {musica.get('titulo')} — {musica.get('artista')} ({musica.get('duracao') // 60}:{musica.get('duracao') % 60:02d}) - Tocada em [{timestamp.strftime('%H:%M:%S')}]")
+        for i in range(len(self.history)-1, -1, -1):
+            track, timestamp = self.history[i]
+            print(f"{len(self.history) - i}. {track.title} — {track.artist} ({track.duration // 60}:{track.duration % 60:02d}) - Tocada em [{timestamp.strftime('%H:%M:%S')}]")
 
 
-    def smartShuffle(self, n : str):
-        musicas = self.musicas[:int(n)]
+    def smart_shuffle(self, n : int):
+        library = self.library[:n]
         lista = PriorityQueue()
         
-        if len(self.historicoLista) != 0:
-            historico = [item[0] for item in list(self.historicoLista)[-5:]]
+        if len(self.history) != 0:
+            historico = [item[0] for item in list(self.history)[-5:]]
             
-            for musica in musicas:
+            for track in library:
                 posicao_no_historico = 0
 
                 for i in range(len(historico)-1, -1, -1):
-                    if musica.get("id") == historico[i].get("id"):
-                        musica.get("id")
-                        historico[i].get("id")
+                    if track.id == historico[i].id:
+                        track.id
+                        historico[i].id
                         posicao_no_historico = len(historico) - i
                         break
 
@@ -179,68 +195,81 @@ class Player:
                 if posicao_no_historico != 0:
                     penalidade = 5 - posicao_no_historico
 
-                chave = -(musica['avaliacao'] * 10) + penalidade
-                lista.put((chave, musica))
+                chave = -(track.rating * 10) + penalidade
+                lista.put((chave, track))
             
-            self.playlistNovo("Smart Shuffle")
+            self.new_playlist("Smart Shuffle")
             while not lista.empty():
-                chave, musica = lista.get()
-                self.playlistAdicionar(musica["id"])
+                chave, track = lista.get()
+                self.add_to_playlist(track.id)
             
-            self.playlistMostrar()
+            self.playlist_show()
         else:
-            for musica in musicas:
-                chave = (-(musica['avaliacao'] * 10), random.random())
-                lista.put((chave, musica))
+            for track in library:
+                chave = (-(track.rating * 10), random.random())
+                lista.put((chave, track))
             
-            self.playlistNovo("Smart Shuffle")
+            self.new_playlist("Smart Shuffle")
             while not lista.empty():
-                chave, musica = lista.get()
-                self.playlistAdicionar(musica["id"])
+                chave, track = lista.get()
+                self.add_to_playlist(track.id)
             
-            self.playlistMostrar()
+            self.playlist_show()
 
 
-    def salvar(self, arquivo):
+    def save_state(self, arquivo):
         if not arquivo:
             print("Arquivo não informado.")
             return
 
         playlist_ids = []
         cursor_index = None
-        if self.playlist_obj is not None:
+        if self.playlist is not None:
             playlist_ids = []
-            for musica in self.playlist_obj:
-                if musica is not None:
-                    playlist_ids.append(musica.get("id"))
-            cursor_track = self.playlist_obj.current()
+            for track in self.playlist:
+                if track is not None:
+                    playlist_ids.append(track.id)
+            cursor_track = self.playlist.current()
             if cursor_track is not None:
                 try:
-                    cursor_index = playlist_ids.index(cursor_track.get("id"))
+                    cursor_index = playlist_ids.index(cursor_track.id)
                 except ValueError:
                     cursor_index = None
 
-        fila_ids = [musica.get("id") for musica in self.filaUpNext if musica is not None]
-        historico = []
-        for musica, timestamp in self.historicoLista:
-            if musica is None:
+        up_next_ids = [track.id for track in self.up_next if track is not None]
+        history = []
+        for track, timestamp in self.history:
+            print(track)
+            if track is None:
                 continue
-            historico.append(
+            history.append(
                 {
-                    "id": musica.get("id"),
+                    "id": track.id,
                     "timestamp": timestamp.isoformat(),
+                }
+            )
+        library = []
+        for track in self.library:
+            library.append(
+                {
+                    "id": track.id,
+                    "title": track.title,
+                    "artist": track.artist,
+                    "duration": track.duration,
+                    "rating": track.rating,
+                    "date_added": track.data_adicao,
                 }
             )
 
         estado = {
-            "musicas": self.musicas,
+            "library": library,
             "playlist": {
-                "nome": getattr(self, "playlist", None),
+                "nome": self.playlist_name,
                 "tracks": playlist_ids,
                 "cursor_index": cursor_index,
             },
-            "fila_up_next": fila_ids,
-            "historico": historico,
+            "up_next": up_next_ids,
+            "history": history,
         }
 
         with open(arquivo, "w", encoding="utf-8") as f:
@@ -249,78 +278,112 @@ class Player:
         return
 
 
-    def carregar(self, arquivo):
-        if not arquivo or not Path(arquivo).exists():
+    def load_state(self, arquivo):
+        if not arquivo:
+            print("Arquivo não informado.")
+            return
+
+        if not Path(arquivo).exists():
             print("Arquivo não encontrado.")
             return
 
         with open(arquivo, "r", encoding="utf-8") as f:
             estado = json.load(f)
 
-        self.musicas = estado.get("musicas", [])
-        musicas_por_id = {musica.get("id"): musica for musica in self.musicas}
+        library_data = estado.get("library", [])
+        if library_data:
+            self.library = []
+            for track in library_data:
+                self.library.append(
+                    Track(
+                        id=track.get("id"),
+                        title=track.get("title"),
+                        artist=track.get("artist"),
+                        duration=track.get("duration"),
+                        rating=track.get("rating"),
+                        data_adicao=track.get("date_added") or track.get("data_adicao"),
+                    )
+                )
 
-        playlist_info = estado.get("playlist", {})
-        self.playlist = playlist_info.get("nome")
-        self.playlist_obj = DoublyLinkedList()
-        for track_id in playlist_info.get("tracks", []):
-            musica = musicas_por_id.get(track_id)
-            if musica is not None:
-                self.playlist_obj.add(musica)
+        id_to_track = {}
+        for track in self.library:
+            if track is not None:
+                id_to_track[track.id] = track
 
-        cursor_index = playlist_info.get("cursor_index")
-        if cursor_index is not None and self.playlist_obj is not None:
-            self.playlist_obj.reset_cursor()
-            for _ in range(cursor_index):
-                if not self.playlist_obj.move_next():
-                    break
+        playlist_data = estado.get("playlist", {})
+        playlist_ids = playlist_data.get("tracks", []) or []
+        cursor_index = playlist_data.get("cursor_index")
+        self.playlist_name = playlist_data.get("nome")
 
-        self.filaUpNext = deque()
-        for track_id in estado.get("fila_up_next", []):
-            musica = musicas_por_id.get(track_id)
-            if musica is not None:
-                self.filaUpNext.append(musica)
+        playlist = DoublyLinkedList()
+        for track_id in playlist_ids:
+            track = id_to_track.get(track_id)
+            if track is not None:
+                playlist.add(track)
 
-        self.historicoLista = deque(maxlen=20)
-        for item in estado.get("historico", []):
-            musica = musicas_por_id.get(item.get("id"))
-            if musica is None:
+        if len(playlist) > 0:
+            if isinstance(cursor_index, int) and 0 <= cursor_index < len(playlist):
+                playlist.reset_cursor()
+                for _ in range(cursor_index):
+                    playlist.move_next()
+            elif cursor_index is None:
+                playlist._cursor = None
+            else:
+                playlist.reset_cursor()
+
+        self.playlist = playlist
+
+        self.up_next = deque()
+        for track_id in estado.get("up_next", []) or []:
+            track = id_to_track.get(track_id)
+            if track is not None:
+                self.up_next.append(track)
+
+        self.history = deque(maxlen=20)
+        for item in estado.get("history", []) or []:
+            if not isinstance(item, dict):
                 continue
-            timestamp_str = item.get("timestamp")
-            try:
-                timestamp = datetime.fromisoformat(timestamp_str)
-            except (TypeError, ValueError):
-                timestamp = datetime.now()
-            self.historicoLista.append((musica, timestamp))
+            track = id_to_track.get(item.get("id"))
+            if track is None:
+                continue
+            timestamp = item.get("timestamp")
+            if timestamp:
+                try:
+                    ts = datetime.fromisoformat(timestamp)
+                except ValueError:
+                    ts = None
+            else:
+                ts = None
+            self.history.append((track, ts))
 
         print(f"Estado carregado de {arquivo}.")
         return
     
-    def registrarComandos(self):
-        self.comandos = [
-            {'comando': 'library list', 'opcao': '[--by rating|title|artist]', 'funcao': self.bibliotecaListar},
-            {'comando': 'library load', 'opcao': '<arquivo>', 'funcao': self.bibliotecaCarregar},
-            {'comando': 'playlist new', 'opcao': '<nome>', 'funcao': self.playlistNovo},
-            {'comando': 'playlist add', 'opcao': 'track_id', 'funcao': self.playlistAdicionar},
-            {'comando': 'playlist remove', 'opcao': 'pos', 'funcao': self.playlistRemover},
-            {'comando': 'playlist show', 'opcao': None, 'funcao': self.playlistMostrar},
-            {'comando': 'play', 'opcao': None, 'funcao': self.tocar},
-            {'comando': 'next', 'opcao': None, 'funcao': self.proximo},
-            {'comando': 'prev', 'opcao': None, 'funcao': self.anterior},
-            {'comando': 'enqueue', 'opcao': '<track_id>', 'funcao': self.enfileirar},
-            {'comando': 'queue show', 'opcao': None, 'funcao': self.mostrarFila},
-            {'comando': 'history', 'opcao': None, 'funcao': self.historico},
-            {'comando': 'smart-shuffle', 'opcao': '<n>', 'funcao': self.smartShuffle},
-            {'comando': 'save', 'opcao': '<arquivo>', 'funcao': self.salvar},
-            {'comando': 'load', 'opcao': '<arquivo>', 'funcao': self.carregar},
-            {'comando': 'help', 'opcao': None, 'funcao': self.ajuda},
-            {'comando': 'quit', 'opcao': None, 'funcao': self.quit},
+    def registerCommands(self):
+        self.commands = [
+            {'command': 'library list', 'option': '[--by rating|title|artist]', 'function': self.list_library},
+            {'command': 'library load', 'option': '<arquivo>', 'function': self.load_library},
+            {'command': 'playlist new', 'option': '<nome>', 'function': self.new_playlist},
+            {'command': 'playlist add', 'option': 'track_id', 'function': self.add_to_playlist},
+            {'command': 'playlist remove', 'option': 'pos', 'function': self.remove_from_playlist},
+            {'command': 'playlist show', 'option': None, 'function': self.playlist_show},
+            {'command': 'play', 'option': None, 'function': self.play},
+            {'command': 'next', 'option': None, 'function': self.next},
+            {'command': 'prev', 'option': None, 'function': self.prev},
+            {'command': 'enqueue', 'option': '<track_id>', 'function': self.enqueue},
+            {'command': 'queue show', 'option': None, 'function': self.queue_show},
+            {'command': 'history', 'option': None, 'function': self.playback_history},
+            {'command': 'smart-shuffle', 'option': '<n>', 'function': self.smart_shuffle},
+            {'command': 'save', 'option': '<arquivo>', 'function': self.save_state},
+            {'command': 'load', 'option': '<arquivo>', 'function': self.load_state},
+            {'command': 'help', 'option': None, 'function': self.help},
+            {'command': 'quit', 'option': None, 'function': self.quit},
         ]
 
 
-    def ajuda(self):
-        for comando in self.comandos:
-            if comando['opcao']:
-                print(f"{comando['comando']} {comando['opcao']}")
+    def help(self):
+        for command in self.commands:
+            if command['option']:
+                print(f"{command['command']} {command['option']}")
             else:
-                print(comando['comando'])
+                print(command['command'])
