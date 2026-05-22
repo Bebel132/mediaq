@@ -3,7 +3,7 @@ from player import MediaPlayer
 
 player = MediaPlayer()
 
-def rodar():
+def run():
     player.registerCommands()
     while player.running:
         user_input = input("mediaq> ").lower()
@@ -25,9 +25,18 @@ def rodar():
                 # para verificar se o comando precisa de um argumento ou não, e chamar a função correspondente
                 if len(user_input) == 1:
                     command["function"]()
+                
                 if len(user_input) == 2:
-                    command["function"](user_input[1])
+                    if command["input_type"] == str:
+                        command["function"](user_input[1])
+                    elif command["input_type"] == int:
+                        command["function"](int(user_input[1]))
+                        
                 if len(user_input) >= 3:
-                    command["function"](user_input[1:])
+                    if command["input_type"] == str:
+                        command["function"](user_input[1:])
+                    elif command["input_type"] == int:
+                        command["function"](int(user_input[1]))
+
         if not aux:
             print("Comando não reconhecido. Digite 'help' para ver os comandos disponíveis.")

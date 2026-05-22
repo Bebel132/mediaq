@@ -14,34 +14,34 @@ O foco do projeto está no uso adequado de quatro estruturas lineares distintas,
 ## Exemplo de sessão
 ```bash
 mediaq> library load library_exemplo.json 
-Bibioteca carregada: 12 faixas
+Bibioteca carregada: 10 faixas
 mediaq> playlist new minha
 Playlist "minha" criada.
 mediaq> playlist add 3
 mediaq> playlist add 7
 mediaq> playlist add 1
 mediaq> playlist show
-> 1. Azul — Zimbra (3:18)
-2. Talvez Eu Esteja — Selvagens a Procura de Lei (3:27)
-3. Verao — Zimbra (3:51)
+> 1. Carinhoso — Pixinguinha (3:05)
+  2. O Leãozinho — Caetano Veloso (2:36)
+  3. Águas de Março — Elis Regina (3:32)
 
-mediaq> play     
->>> Tocando: "Azul" — Zimbra (3:18)
+mediaq> play
+>>> Tocando: "Carinhoso" — Pixinguinha (3:05)
 mediaq> enqueue 5
 mediaq> next
->>> Tocando: "Destruicao" — Selvagens a Procura de Lei (3:30)
+>>> Tocando: "Asa Branca" — Luiz Gonzaga (2:45)
 mediaq> next
->>> Tocando: "Talvez Eu Esteja" — Selvagens a Procura de Lei (3:27)
+>>> Tocando: "O Leãozinho" — Caetano Veloso (2:36)
 mediaq> next
->>> Tocando: "Verao" — Zimbra (3:51)
+>>> Tocando: "Águas de Março" — Elis Regina (3:32)
 mediaq> next
 Fim da playlist. Use 'playlist show' para ver as músicas ou 'enqueue <track_id>' para adicionar músicas à fila.
 mediaq> history
-1. Verao — Zimbra (3:51) - Tocada em [12:03:39]
-2. Talvez Eu Esteja — Selvagens a Procura de Lei (3:27) - Tocada em [12:03:33]
-3. Destruicao — Selvagens a Procura de Lei (3:30) - Tocada em [12:03:30]
-4. Azul — Zimbra (3:18) - Tocada em [12:03:24]
-mediaq> quit 
+1. Águas de Março — Elis Regina (3:32) - Tocada em [17:06:31]
+2. O Leãozinho — Caetano Veloso (2:36) - Tocada em [17:06:26]
+3. Asa Branca — Luiz Gonzaga (2:45) - Tocada em [17:06:22]
+4. Carinhoso — Pixinguinha (3:05) - Tocada em [17:06:10]
+mediaq> quit
 ```
 
 ## Fórmula para o smart-shuffle

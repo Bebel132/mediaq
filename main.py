@@ -1,3 +1,3 @@
-from cli import rodar
+from cli import run
 
-rodar()
+run()

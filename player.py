@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 import random
 
-from mediaq.models import Track
-from .doubly_linked_list import DoublyLinkedList
+from models import Track
+from doubly_linked_list import DoublyLinkedList
 from collections import deque
 from queue import PriorityQueue
 
@@ -66,7 +66,7 @@ class MediaPlayer:
         for track in ordered_library:
             # :02d adiciona um zero na esquerda se precisar
             #print(f"{track.title} — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})")
-            print(f"{track.title} — {track.artist} {track.duration}")
+            print(f"{track.id}: {track.title} — {track.artist} {track.duration}")
 
 
     def new_playlist(self,nomePlaylist : str):
@@ -112,11 +112,12 @@ class MediaPlayer:
             if len(self.up_next) > 0:
                 track = self.up_next.popleft()
                 self.history.append((track, datetime.now()))
+                print(f'>>> Tocando: "{track.title}" — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})')
                 return track
             else:
                 track = self.playlist.current() 
                 self.history.append((track, datetime.now()))
-                # print(f'>>> Tocando: "{track.get("titulo")}" — {track.get("artista")} ({track.get("duracao") // 60}:{track.get("duracao") % 60:02d})')
+                print(f'>>> Tocando: "{track.title}" — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})')
                 return track
 
 
@@ -127,8 +128,8 @@ class MediaPlayer:
             if len(self.up_next) > 0:
                 track = self.up_next.popleft()
                 self.history.append((track, datetime.now()))
+                print(f'>>> Tocando: "{track.title}" — {track.artist} ({track.duration // 60}:{track.duration % 60:02d})')
                 return track
-                #print(f'>>> Tocando: "{track.get("titulo")}" — {track.get("artista")} ({track.get("duracao") // 60}:{track.get("duracao") % 60:02d})')
             else:
                 if self.playlist.move_next():
                     return self.play()
@@ -361,23 +362,23 @@ class MediaPlayer:
     
     def registerCommands(self):
         self.commands = [
-            {'command': 'library list', 'option': '[--by rating|title|artist]', 'function': self.list_library},
-            {'command': 'library load', 'option': '<arquivo>', 'function': self.load_library},
-            {'command': 'playlist new', 'option': '<nome>', 'function': self.new_playlist},
-            {'command': 'playlist add', 'option': 'track_id', 'function': self.add_to_playlist},
-            {'command': 'playlist remove', 'option': 'pos', 'function': self.remove_from_playlist},
-            {'command': 'playlist show', 'option': None, 'function': self.playlist_show},
-            {'command': 'play', 'option': None, 'function': self.play},
-            {'command': 'next', 'option': None, 'function': self.next},
-            {'command': 'prev', 'option': None, 'function': self.prev},
-            {'command': 'enqueue', 'option': '<track_id>', 'function': self.enqueue},
-            {'command': 'queue show', 'option': None, 'function': self.queue_show},
-            {'command': 'history', 'option': None, 'function': self.playback_history},
-            {'command': 'smart-shuffle', 'option': '<n>', 'function': self.smart_shuffle},
-            {'command': 'save', 'option': '<arquivo>', 'function': self.save_state},
-            {'command': 'load', 'option': '<arquivo>', 'function': self.load_state},
-            {'command': 'help', 'option': None, 'function': self.help},
-            {'command': 'quit', 'option': None, 'function': self.quit},
+            {'command': 'library list', 'option': '[--by rating|title|artist]', 'function': self.list_library, 'input_type': str},
+            {'command': 'library load', 'option': '<arquivo>', 'function': self.load_library, 'input_type': str},
+            {'command': 'playlist new', 'option': '<nome>', 'function': self.new_playlist, 'input_type': str},
+            {'command': 'playlist add', 'option': 'track_id', 'function': self.add_to_playlist, 'input_type': int},
+            {'command': 'playlist remove', 'option': 'pos', 'function': self.remove_from_playlist, 'input_type': int},
+            {'command': 'playlist show', 'option': None, 'function': self.playlist_show, 'input_type': None},
+            {'command': 'play', 'option': None, 'function': self.play, 'input_type': None},
+            {'command': 'next', 'option': None, 'function': self.next, 'input_type': None},
+            {'command': 'prev', 'option': None, 'function': self.prev, 'input_type': None},
+            {'command': 'enqueue', 'option': '<track_id>', 'function': self.enqueue, 'input_type': int},
+            {'command': 'queue show', 'option': None, 'function': self.queue_show, 'input_type': None},
+            {'command': 'history', 'option': None, 'function': self.playback_history, 'input_type': None},
+            {'command': 'smart-shuffle', 'option': '<n>', 'function': self.smart_shuffle, 'input_type': int},
+            {'command': 'save', 'option': '<arquivo>', 'function': self.save_state, 'input_type': str},
+            {'command': 'load', 'option': '<arquivo>', 'function': self.load_state, 'input_type': str},
+            {'command': 'help', 'option': None, 'function': self.help, 'input_type': None},
+            {'command': 'quit', 'option': None, 'function': self.quit, 'input_type': None},
         ]
 
 
