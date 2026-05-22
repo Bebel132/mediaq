@@ -7,8 +7,10 @@ O foco do projeto está no uso adequado de quatro estruturas lineares distintas,
 ## Como executar
 ```bash
   git clone https://github.com/Bebel132/mediaq.git
-  py mediaq.main
+  py -m mediaq.main
 ```
+
+O comando acima deve ser executado na pasta raiz do projeto (onde existe a pasta mediaq). Se você rodar dentro da pasta mediaq, os imports absolutos do pacote não funcionam.
 
 ## Exemplo de sessão
 ```bash
