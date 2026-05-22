@@ -1,4 +1,4 @@
-from player import MediaPlayer
+from mediaq.player import MediaPlayer
 
 
 player = MediaPlayer()

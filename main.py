@@ -1,3 +1,3 @@
-from cli import run
+from mediaq.cli import run
 
 run()

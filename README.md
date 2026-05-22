@@ -7,8 +7,7 @@ O foco do projeto está no uso adequado de quatro estruturas lineares distintas,
 ## Como executar
 ```bash
   git clone https://github.com/Bebel132/mediaq.git
-  cd mediaq
-  py main.py
+  py mediaq.main
 ```
 
 ## Exemplo de sessão

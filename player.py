@@ -3,8 +3,8 @@ import json
 from pathlib import Path
 import random
 
-from models import Track
-from doubly_linked_list import DoublyLinkedList
+from mediaq.models import Track
+from mediaq.doubly_linked_list import DoublyLinkedList
 from collections import deque
 from queue import PriorityQueue
 
